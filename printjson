@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+var fs = require('fs');
+var prettyprint = require('pretty-data').pd;
+var _ = require('underscore');
+
+var json = fs.readFileSync(process.argv[2], "utf8");
+var lines = json.split('\n');
+
+_.each(lines, function(line, x) { 
+   if (line && line.length >= 2) {
+     console.log(prettyprint.json(line));
+   }
+});
+

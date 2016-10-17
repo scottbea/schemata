@@ -97,7 +97,6 @@ function analyzeDataType(dataTypesTable, el, key) {
 					dt.countObjects = (dt.countObjects || 0) + 1;
 				}
 				else {
-					if (el == "2") { debugger; }
 					dt.values = dt.values || [];
 					dt.values.push(el);
 					if (_.isNull(el)) {
@@ -187,7 +186,6 @@ function analyzeJsonData(jsonDataSet, flattenHeaders) {
 
 	_.each(jsonRecords, function(obj) {
 		var record = polymorph.jsonToCsv(obj);
-		debugger;
 		var keys = _.keys(record);
 		var newKeys = [];
 		_.each(keys, function (key) {
@@ -224,8 +222,6 @@ function analyzeJsonData(jsonDataSet, flattenHeaders) {
 		// Apply the defaults to get the merged set
 		_.defaults(all, normalizedRecord);
 	});
-
-	debugger;
 
 	var dataDictionary = buildDataDictionary(all, dataTypesTable, arrayMaxByField, !flattenHeaders);
 	return {superSet: all, fieldTypes: dataDictionary, arraySizes: arrayMaxByField};
@@ -459,19 +455,28 @@ function discoverJsonSchema2(jsonDataSet, flattenHeaders, asSchemaFormat, asSche
 	});
 }
 function discoverJsonValueHistograms(jsonDataSet, flattenHeaders, maxValuesPerField, fieldList) {
-	var maxValues = _.isFinite(maxValuesPerField) ? maxValuesPerField : 0;
+	var maxValues = parseInt(_.isFinite(maxValuesPerField) ? maxValuesPerField : "0");
 	var results = analyzeJsonData(jsonDataSet, flattenHeaders);
 	var dataDictionary = results.fieldTypes;
+
+	console.log(pd.json(dataDictionary));
+
+	debugger;
 
 	var smartIndex = _.indexBy(_.keys(dataDictionary), function(v) { return v; });
 	//var smartIndex = _.indexBy(_.keys(dataDictionary), function(v) { var subFields = v.split('.'); var numSubFields = subFields.length; return rightJustify(numSubFields) + ":" + v; });
 	var alphaIndex = (fieldList ? _.intersection(fieldList, _.keys(smartIndex)) : _.keys(smartIndex)).sort();
 	console.log(pd.json(alphaIndex));
 
+	debugger;
+
 	// Output data lines
 	var output = [];
 
+	debugger;
+
 	_.each(alphaIndex||[], function(skey) {
+		debugger;
 		var key = smartIndex[skey];
 		var info = dataDictionary[key];
 		var values = (info ? info.values : null) || [];
@@ -487,6 +492,7 @@ function discoverJsonValueHistograms(jsonDataSet, flattenHeaders, maxValuesPerFi
 			output.push(util.format("%s\t%d", skey, sortedPairs.length));
 		}
 	});
+	debugger;
 	console.log(output.join("\n"));
 }
 function discoverJsonArrayDimensions(jsonDataSet, flattenHeaders) {

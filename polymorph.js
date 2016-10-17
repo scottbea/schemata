@@ -508,7 +508,7 @@ function convertStringToInt(candidateString) {
 function convertCsvToJson(csvData, schema, mapping, asJsonArray, fieldSeparator, skipHeader) {
 	//_.each(headers, function(header, i) { console.log("%s\t%s\t%s\t%s", i, header, row[i], map[header] ? map[header] : ""); });
 
-	var max = 1000000;
+	var max = 10000000;
 	if (asJsonArray) { console.log("["); }
 
 	var rows = csvData.split(DefaultLineFeedSplit);
@@ -533,7 +533,7 @@ function convertCsvToJson(csvData, schema, mapping, asJsonArray, fieldSeparator,
 		if (index >= max) process.exit(0);
 		var cols;
 		if (fieldSeparator === ',') {
-			cols = CSV.parse(row, fieldSeparator)[0];
+			cols = CSV.parse(row, fieldSeparator)[0] || [];
 		}
 		else {
 			cols = row.split(fieldSeparator);
@@ -564,7 +564,7 @@ function convertCsvToJson(csvData, schema, mapping, asJsonArray, fieldSeparator,
 function convertTsvToJson(flattenedData, schema, mapping, asJsonArray) {
 	//_.each(headers, function(header, i) { console.log("%s\t%s\t%s\t%s", i, header, row[i], map[header] ? map[header] : ""); });
 
-	var max = 1000000;
+	var max = 10000000;
 	if (asJsonArray) { console.log("["); }
 	var rows = flattenedData.split(DefaultLineFeedSplit);
 	var numberRows = rows.length-1;

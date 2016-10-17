@@ -20,7 +20,7 @@ function usage() {
 	console.log("\tnode schematize.js --keys <file.json>");
 	console.log("\tnode schematize.js --flatten <file.json> <file.schema>");
 	console.log("\tnode schematize.js --extrude <file.json> <file.schema>");
-	console.log("\tnode schematize.js --values <file.json> <max_values_per_field> <field_list_csv>");
+	console.log("\tnode schematize.js --values <file.json> [<max_values_per_field> [[<max_records> [<field_list_csv>]]]");
 	console.log("\tnode schematize.js --dimensions <file.json>");
 	console.log("\tnode schematize.js --json2csv <file.json> <file.schema>");
 	console.log("\tnode schematize.js --merge <source.json> <updates.json>");
@@ -94,8 +94,10 @@ function processJson2Schema2Command(dataFileName, useAlphabeticalSort, asJsonArr
 	var jsonDataSet = polymorph.loadJsonDataSet(dataFileName, asJsonArray);
 	scheme.discoverJsonSchema2(jsonDataSet, false, true, true, useAlphabeticalSort);
 }
-function processValuesCommand(dataFileName, maxValuesPerField, fieldListSpecifier, asJsonArray) {
-	polymorph.loadJsonDataSetAsync(dataFileName, asJsonArray, 10000, 0, function(err, jsonDataSet) {
+function processValuesCommand(dataFileName, maxValuesPerField, maxRecords, fieldListSpecifier, asJsonArray) {
+	//console.log("dataFileName=%s, maxValuesPerField=%s, maxRecords=%s, fieldListSpecifier=%s, asJsonArray=%s", dataFileName, maxValuesPerField, maxRecords, fieldListSpecifier, asJsonArray);
+	var max = parseInt(_.isFinite(maxRecords) ? maxRecords : "10000");
+	polymorph.loadJsonDataSetAsync(dataFileName, asJsonArray, max, 0, function(err, jsonDataSet) {
 		if (!err && jsonDataSet) {
 			var fieldList = fieldListSpecifier ? _.map(fieldListSpecifier.split(','), function(s) { return s.trim(); }) : null;
 			scheme.discoverJsonValueHistograms(jsonDataSet, true, maxValuesPerField, fieldList);
@@ -161,6 +163,7 @@ function processCommandLine() {
 	var p1 = (fileParameters.length > 0) ? fileParameters[0] : null;
 	var p2 = (fileParameters.length > 1) ? fileParameters[1] : null;
 	var p3 = (fileParameters.length > 2) ? fileParameters[2] : null;
+	var p4 = (fileParameters.length > 3) ? fileParameters[3] : null;
 
 	switch(command) {
 		case "--parse": case "schema": processSchemaCommand(p1); break;
@@ -172,7 +175,7 @@ function processCommandLine() {
 		case "--json2schema": processJson2SchemaCommand(p1, useAlphaSort, asJsonArray); break;
 		case "--json2schema2": processJson2Schema2Command(p1, useAlphaSort, asJsonArray); break;
 		case "--keys": case "keys": case "headers": processHeadersCommand(p1, asJsonArray); break;
-		case "--values": case "values": processValuesCommand(p1, p2, p3, asJsonArray); break;
+		case "--values": case "values": processValuesCommand(p1, p2, p3, p4, asJsonArray); break;
 		case "--dimensions": case "dimensions": processDimensionsCommand(p1, asJsonArray); break;
 		case "--json2csv": case "csv": processCsvCommand(p1, p2, asJsonArray); break;
 		case "--flatten": case "flatten": processFlattenCommand(p1, p2, asJsonArray); break;
